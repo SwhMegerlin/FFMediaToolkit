@@ -35,6 +35,11 @@
         public int NumSamples => Pointer != null ? Pointer->nb_samples : default;
 
         /// <summary>
+        /// Gets the duration in timebase
+        /// </summary>
+        public long Duration => Pointer != null ? Pointer->pkt_duration : 0;
+
+        /// <summary>
         /// Gets the sample rate.
         /// </summary>
         public int SampleRate => Pointer != null ? Pointer->sample_rate : default;

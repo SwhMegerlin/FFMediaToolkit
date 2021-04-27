@@ -1,11 +1,13 @@
 ﻿namespace FFMediaToolkit.Decoding.Internal
 {
-    using System;
-    using System.Collections.Generic;
     using FFMediaToolkit.Common;
     using FFMediaToolkit.Common.Internal;
     using FFMediaToolkit.Helpers;
+
     using FFmpeg.AutoGen;
+
+    using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Represents a input multimedia stream.
@@ -102,11 +104,24 @@
         /// <param name="targetTs">The target time stamp.</param>
         public void SkipFrames(long targetTs)
         {
-            do
+            if (Info.Type == MediaType.Audio)
             {
-                ReadNextFrame();
+                // Audio frames must be treated different because audio frames covering a large timespan
+                do
+                {
+                    ReadNextFrame();
+                }
+                while ((RecentlyDecodedFrame.PresentationTimestamp + (RecentlyDecodedFrame as AudioFrame)?.Duration) < targetTs);
             }
-            while (RecentlyDecodedFrame.PresentationTimestamp < targetTs);
+            else
+            {
+                // Gets the next frame until greater or equal requested timestamp
+                do
+                {
+                    ReadNextFrame();
+                }
+                while (RecentlyDecodedFrame.PresentationTimestamp < targetTs);
+            }
         }
 
         /// <summary>
