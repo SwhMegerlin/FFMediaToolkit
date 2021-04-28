@@ -35,7 +35,7 @@
         public int NumSamples => Pointer != null ? Pointer->nb_samples : default;
 
         /// <summary>
-        /// Gets the duration in timebase
+        /// Gets the duration in timebase units.
         /// </summary>
         public long Duration => Pointer != null ? Pointer->pkt_duration : 0;
 
@@ -67,8 +67,8 @@
         /// <param name="num_samples">The number of samples in the audio frame.</param>
         /// <param name="channel_layout">The channel layout to be used by the audio frame.</param>
         /// <param name="sampleFormat">The audio sample format.</param>
-        /// <param name="decodingTimestamp">The timestamp when the frame has to be decoded</param>
-        /// <param name="presentationTimestamp">The timestamp when the frame has to be presented</param>
+        /// <param name="decodingTimestamp">The timestamp when the frame has to be decoded.</param>
+        /// <param name="presentationTimestamp">The timestamp when the frame has to be presented.</param>
         /// <returns>The new audio frame.</returns>
         public static AudioFrame Create(int sample_rate, int num_channels, int num_samples, long channel_layout, SampleFormat sampleFormat, long decodingTimestamp, long presentationTimestamp)
         {

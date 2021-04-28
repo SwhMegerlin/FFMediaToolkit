@@ -30,6 +30,16 @@
         public int NumChannels => frame.NumChannels;
 
         /// <summary>
+        /// Gets the frame PTS value in the stream time base units.
+        /// </summary>
+        public long PresentationTimestamp => frame.PresentationTimestamp;
+
+        /// <summary>
+        /// Gets the duration in timebase units.
+        /// </summary>
+        public long Duration => frame.Duration;
+
+        /// <summary>
         /// Fetches raw audio data from this audio frame for specified channel.
         /// </summary>
         /// <param name="channel">The index of audio channel that should be retrieved, allowed range: [0..<see cref="NumChannels"/>).</param>

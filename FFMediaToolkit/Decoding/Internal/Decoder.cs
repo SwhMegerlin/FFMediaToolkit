@@ -1,13 +1,12 @@
 ﻿namespace FFMediaToolkit.Decoding.Internal
 {
+    using System;
+    using System.Collections.Generic;
     using FFMediaToolkit.Common;
     using FFMediaToolkit.Common.Internal;
     using FFMediaToolkit.Helpers;
 
     using FFmpeg.AutoGen;
-
-    using System;
-    using System.Collections.Generic;
 
     /// <summary>
     /// Represents a input multimedia stream.
