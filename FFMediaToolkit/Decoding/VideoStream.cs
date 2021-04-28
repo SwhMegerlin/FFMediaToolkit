@@ -68,6 +68,22 @@
         }
 
         /// <summary>
+        /// Reads the next frame from the video stream and returns meta data.
+        /// </summary>
+        /// <param name="presentationTimestamp">timestamp when the returned image shall be displayed.</param>
+        /// <param name="frameNumber">framenumber of the returned image</param>
+        /// <returns>A decoded bitmap.</returns>
+        /// <exception cref="EndOfStreamException">End of the stream.</exception>
+        /// <exception cref="FFmpegException">Internal decoding error.</exception>
+        public ImageData GetNextFrame(out TimeSpan presentationTimestamp, out long frameNumber)
+        {
+            var frame = base.GetNextFrame() as VideoFrame;
+            frameNumber = frame.FrameNumber;
+            presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);
+            return frame.ToBitmap(Converter.Value, Options.VideoPixelFormat, OutputFrameSize);
+        }
+
+        /// <summary>
         /// Reads the next frame from the video stream.
         /// A <see langword="false"/> return value indicates that reached end of stream.
         /// The method throws exception if another error has occurred.
@@ -108,6 +124,31 @@
             {
                 bitmap = default;
                 presentationTimestamp = TimeSpan.Zero;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Reads the next frame from the video stream and returns meta data.
+        /// </summary>
+        /// <param name="bitmap">The decoded video frame.</param>
+        /// <param name="presentationTimestamp">timestamp when the returned image shall be displayed.</param>
+        /// <param name="frameNumber">framenumber of the returned image</param>
+        /// <returns>A decoded bitmap.</returns>
+        /// <exception cref="EndOfStreamException">End of the stream.</exception>
+        /// <exception cref="FFmpegException">Internal decoding error.</exception>
+        public bool TryGetNextFrame(out ImageData bitmap, out TimeSpan presentationTimestamp, out long frameNumber)
+        {
+            try
+            {
+                bitmap = GetNextFrame(out presentationTimestamp, out frameNumber);
+                return true;
+            }
+            catch (EndOfStreamException)
+            {
+                bitmap = default;
+                presentationTimestamp = TimeSpan.Zero;
+                frameNumber = -1;
                 return false;
             }
         }
@@ -201,6 +242,23 @@
 
         /// <summary>
         /// Reads the video frame found at the specified timestamp.
+        /// </summary>
+        /// <param name="time">The frame timestamp.</param>
+        /// <param name="presentationTimestamp">timestamp when the returned image shall be displayed.</param>
+        /// <param name="frameNumber">framenumber of the returned image</param>
+        /// <returns>The decoded video frame.</returns>
+        /// <exception cref="EndOfStreamException">End of the stream.</exception>
+        /// <exception cref="FFmpegException">Internal decoding error.</exception>
+        public ImageData GetFrame(TimeSpan time, out TimeSpan presentationTimestamp, out long frameNumber)
+        {
+            var frame = base.GetFrame(time) as VideoFrame;
+            frameNumber = frame.FrameNumber;
+            presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);
+            return frame.ToBitmap(Converter.Value, Options.VideoPixelFormat, OutputFrameSize);
+        }
+
+        /// <summary>
+        /// Reads the video frame found at the specified timestamp.
         /// A <see langword="false"/> return value indicates that reached end of stream.
         /// The method throws exception if another error has occurred.
         /// </summary>
@@ -243,6 +301,33 @@
             {
                 bitmap = default;
                 presentationTimestamp = TimeSpan.Zero;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Reads the video frame found at the specified timestamp.
+        /// A <see langword="false"/> return value indicates that reached end of stream.
+        /// The method throws exception if another error has occurred.
+        /// </summary>
+        /// <param name="time">The frame timestamp.</param>
+        /// <param name="bitmap">The decoded video frame.</param>
+        /// <param name="presentationTimestamp">timestamp when the returned image shall be displayed.</param>
+        /// <param name="frameNumber">framenumber of the returned image</param>
+        /// <returns><see langword="false"/> if reached end of the stream.</returns>
+        /// <exception cref="FFmpegException">Internal decoding error.</exception>
+        public bool TryGetFrame(TimeSpan time, out ImageData bitmap, out TimeSpan presentationTimestamp, out long frameNumber)
+        {
+            try
+            {
+                bitmap = GetFrame(time, out presentationTimestamp, out frameNumber);
+                return true;
+            }
+            catch (EndOfStreamException)
+            {
+                bitmap = default;
+                presentationTimestamp = TimeSpan.Zero;
+                frameNumber = -1;
                 return false;
             }
         }

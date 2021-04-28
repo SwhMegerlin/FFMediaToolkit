@@ -41,6 +41,11 @@
         public AVPixelFormat PixelFormat => Pointer != null ? (AVPixelFormat)Pointer->format : default;
 
         /// <summary>
+        ///  Gets the frame number of the video frame (presentation)
+        /// </summary>
+        public long FrameNumber => Pointer != null ? Pointer->display_picture_number : -1; 
+
+        /// <summary>
         /// Creates a video frame with given dimensions and allocates a buffer for it.
         /// </summary>
         /// <param name="dimensions">The dimensions of the video frame.</param>
