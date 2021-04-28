@@ -78,7 +78,7 @@
         public ImageData GetNextFrame(out TimeSpan presentationTimestamp, out long frameNumber)
         {
             var frame = base.GetNextFrame() as VideoFrame;
-            frameNumber = frame.FrameNumber;
+            frameNumber = calculateFrameNumber(frame);
             presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);
             return frame.ToBitmap(Converter.Value, Options.VideoPixelFormat, OutputFrameSize);
         }
@@ -252,8 +252,8 @@
         public ImageData GetFrame(TimeSpan time, out TimeSpan presentationTimestamp, out long frameNumber)
         {
             var frame = base.GetFrame(time) as VideoFrame;
-            frameNumber = frame.FrameNumber;
             presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);
+            frameNumber = calculateFrameNumber(frame);
             return frame.ToBitmap(Converter.Value, Options.VideoPixelFormat, OutputFrameSize);
         }
 
@@ -397,5 +397,19 @@
         {
             Converter.Value.AVFrameToBitmap(frame, target, outputFrameStride);
         }
+
+        private long calculateFrameNumber(VideoFrame frame)
+        {
+            if ((frame.PresentationTimestamp == 0) ||
+                (frame.FrameNumber != 0))
+            {
+                return  frame.FrameNumber;
+            }
+            else
+            {
+                return (long)(frame.PresentationTimestamp / (base.Info.TimeBase.ToDouble() * base.Info.AvgFrameRate));
+            }
+        }
+
     }
 }
