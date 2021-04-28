@@ -403,11 +403,11 @@
             if ((frame.PresentationTimestamp == 0) ||
                 (frame.FrameNumber != 0))
             {
-                return  frame.FrameNumber;
+                return frame.FrameNumber;
             }
             else
             {
-                return (long)(frame.PresentationTimestamp / (base.Info.TimeBase.ToDouble() * base.Info.AvgFrameRate));
+                return (long)((frame.PresentationTimestamp * base.Info.TimeBase.num / base.Info.TimeBase.den) * base.Info.AvgFrameRate );
             }
         }
 
