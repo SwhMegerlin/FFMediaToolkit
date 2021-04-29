@@ -1,19 +1,23 @@
 ﻿namespace FFMediaToolkit.Decoding.Internal
 {
-    using System;
-    using System.IO;
-
     using FFMediaToolkit.Common;
     using FFMediaToolkit.Common.Internal;
     using FFMediaToolkit.Helpers;
 
     using FFmpeg.AutoGen;
 
+    using NLog;
+
+    using System;
+    using System.IO;
+
     /// <summary>
     /// Represents the multimedia file container.
     /// </summary>
     internal unsafe class InputContainer : Wrapper<AVFormatContext>
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         private static avio_alloc_context_read_packet readCallback;
         private static avio_alloc_context_seek seekCallback;
 
@@ -78,10 +82,18 @@
         /// <param name="streamIndex">The stream index. It will be used only to get the correct time base value.</param>
         public void SeekFile(long targetTs, int streamIndex)
         {
+            Log.Warn($"Entered SeekFile({targetTs},{streamIndex})");
             ffmpeg.av_seek_frame(Pointer, streamIndex, targetTs, ffmpeg.AVSEEK_FLAG_BACKWARD).ThrowIfError($"Seek to {targetTs} failed.");
 
-            Decoders[streamIndex].FlushUnmanagedBuffers();
+            //needed because filing buffers is independent of stream number
+            foreach (var decoder in Decoders)
+            {
+                decoder?.FlushUnmanagedBuffers();
+            }
+            //Decoders[streamIndex].FlushUnmanagedBuffers();
             GetPacketFromStream(streamIndex);
+
+            Log.Warn($"Leaving SeekFile({targetTs},{streamIndex})");
         }
 
         /// <summary>
@@ -95,6 +107,7 @@
             {
                 packet = ReadPacket();
                 var stream = Decoders[packet.StreamIndex];
+
                 if (stream == null)
                 {
                     packet.Wipe();
@@ -105,6 +118,7 @@
                 {
                     stream.BufferPacket(packet);
                 }
+
             }
             while (packet?.StreamIndex != streamIndex);
         }

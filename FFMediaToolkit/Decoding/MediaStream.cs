@@ -5,11 +5,15 @@
     using FFMediaToolkit.Decoding.Internal;
     using FFMediaToolkit.Helpers;
 
+    using NLog;
+
     /// <summary>
     /// A base for streams of any kind of media.
     /// </summary>
     public class MediaStream : IDisposable
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaStream"/> class.
         /// </summary>
@@ -20,7 +24,8 @@
             Stream = stream;
             Options = options;
 
-            Threshold = TimeSpan.FromSeconds(0.5).ToTimestamp(Info.TimeBase);
+            //Threshold = TimeSpan.FromSeconds(0.5).ToTimestamp(Info.TimeBase);
+            Threshold = 1;
         }
 
         /// <summary>
@@ -63,7 +68,11 @@
         /// Gets the data belonging to the next frame in the stream.
         /// </summary>
         /// <returns>The next frame's data.</returns>
-        internal MediaFrame GetNextFrame() => Stream.GetNextFrame();
+        internal MediaFrame GetNextFrame()
+        {
+            Log.Info("GetNextFrame: Forwarding call to stream");
+            return Stream.GetNextFrame();
+        }
 
         /// <summary>
         /// Seeks the stream to the specified time and returns the nearest frame's data.
@@ -73,6 +82,12 @@
         internal MediaFrame GetFrame(TimeSpan time)
         {
             var ts = time.ToTimestamp(Info.TimeBase);
+            var frame = GetFrameByTimestamp(ts);
+            return frame;
+        }
+
+        internal MediaFrame GetFrame(long ts)
+        {
             var frame = GetFrameByTimestamp(ts);
             return frame;
         }

@@ -106,5 +106,18 @@
 
             base.Update(newFrame);
         }
+
+        public override string ToString()
+        {
+            if (Pointer != null)
+            {
+                return $"VideoFrame[BestEffortTimeStamp = {Pointer->best_effort_timestamp}, Error = {Pointer->error}, PTS = {Pointer->pts}]";
+            }
+            else
+            {
+                return "VideoFrame";
+            }
+        }
+
     }
 }

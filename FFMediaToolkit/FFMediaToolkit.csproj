@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <PackageReference Include="FFmpeg.AutoGen" Version="4.3.0.1" />
+    <PackageReference Include="NLog" Version="4.7.9" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

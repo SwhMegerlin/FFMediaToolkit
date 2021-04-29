@@ -6,16 +6,21 @@
     using FFMediaToolkit.Common;
     using FFMediaToolkit.Decoding.Internal;
 
+    using NLog;
+
     /// <summary>
     /// Represents a multimedia file.
     /// </summary>
     public class MediaFile : IDisposable
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         private readonly InputContainer container;
         private bool isDisposed;
 
         private unsafe MediaFile(InputContainer container, MediaOptions options)
         {
+            Log.Info("Opened media file");
             this.container = container;
 
             var video = container.Decoders.Where(codec => codec?.Info.Type == MediaType.Video);

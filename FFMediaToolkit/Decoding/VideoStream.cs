@@ -9,11 +9,15 @@
     using FFMediaToolkit.Helpers;
     using FFmpeg.AutoGen;
 
+    using NLog;
+
     /// <summary>
     /// Represents a video stream in the <see cref="MediaFile"/>.
     /// </summary>
     public class VideoStream : MediaStream
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         private readonly int outputFrameStride;
         private readonly int requiredBufferSize;
 
@@ -77,9 +81,11 @@
         /// <exception cref="FFmpegException">Internal decoding error.</exception>
         public ImageData GetNextFrame(out TimeSpan presentationTimestamp, out long frameNumber)
         {
+            Log.Debug("Entered GetNextFrame");
             var frame = base.GetNextFrame() as VideoFrame;
             frameNumber = calculateFrameNumber(frame);
             presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);
+            Log.Debug("Returned frame: " + frame.ToString());
             return frame.ToBitmap(Converter.Value, Options.VideoPixelFormat, OutputFrameSize);
         }
 
@@ -407,7 +413,7 @@
             }
             else
             {
-                return (long)((frame.PresentationTimestamp * base.Info.TimeBase.num / base.Info.TimeBase.den) * base.Info.AvgFrameRate );
+                return (long)((frame.PresentationTimestamp * base.Info.TimeBase.num / (double)base.Info.TimeBase.den) * base.Info.AvgFrameRate );
             }
         }
 

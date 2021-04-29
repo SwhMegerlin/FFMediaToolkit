@@ -46,5 +46,10 @@
             var ptr = Pointer;
             ffmpeg.av_frame_free(&ptr);
         }
+
+        public override string ToString()
+        {
+            return $"MediaFrame[PTS={this.PresentationTimestamp}, DTS={this.DecodingTimestamp}]";
+        }
     }
 }

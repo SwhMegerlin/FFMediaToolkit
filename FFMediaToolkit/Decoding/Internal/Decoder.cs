@@ -8,11 +8,15 @@
 
     using FFmpeg.AutoGen;
 
+    using NLog;
+
     /// <summary>
     /// Represents a input multimedia stream.
     /// </summary>
     internal unsafe class Decoder : Wrapper<AVCodecContext>
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         private readonly int bufferLimit;
         private int bufferSize = 0;
         private bool reuseLastPacket;
@@ -93,7 +97,9 @@
         /// <returns>The decoded frame.</returns>
         public MediaFrame GetNextFrame()
         {
+            Log.Debug($"Entered GetNextFrame ({Info.Type})");
             ReadNextFrame();
+            Log.Debug($"Leaving GetNextFrame ({Info.Type}) returns " + RecentlyDecodedFrame.ToString());
             return RecentlyDecodedFrame;
         }
 
@@ -153,6 +159,7 @@
 
         private void ReadNextFrame()
         {
+            Log.Debug($"Entered ReadNextFrame ({Info.Type})");
             ffmpeg.av_frame_unref(RecentlyDecodedFrame.Pointer);
             int error;
 
@@ -163,16 +170,25 @@
             }
             while (error == ffmpeg.AVERROR(ffmpeg.EAGAIN) || error == -35); // The EAGAIN code means that the frame decoding has not been completed and more packets are needed.
             error.ThrowIfError("An error occurred while decoding the frame.");
+            Log.Debug($"Leaving ReadNextFrame ({Info.Type})");
         }
 
         private void DecodePacket()
         {
+            Log.Debug($"Entered DecodePacket({Info.Type})");
+            
             if (!reuseLastPacket)
             {
+
                 if (IsBufferEmpty)
+                {
+                    Log.Debug($"Fetching new Packet from Stream({Info.Type})");
                     OwnerFile.GetPacketFromStream(Info.Index);
+                }
+                
                 packet = BufferedPackets.Dequeue();
                 bufferSize -= packet.Pointer->size;
+                Log.Debug($"Dequeued Packet from queue ({Info.Type})" + packet.ToString());
             }
 
             // Sends the packet to the decoder.
@@ -188,6 +204,7 @@
                 result.ThrowIfError("Cannot send a packet to the decoder.");
                 packet.Wipe();
             }
+            Log.Debug($"Leaving ({Info.Type})");
         }
     }
 }

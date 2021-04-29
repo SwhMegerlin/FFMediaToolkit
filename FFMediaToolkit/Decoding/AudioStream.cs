@@ -5,6 +5,8 @@
     using FFMediaToolkit.Audio;
     using FFMediaToolkit.Common.Internal;
     using FFMediaToolkit.Decoding.Internal;
+    using FFMediaToolkit.Helpers;
+
     using FFmpeg.AutoGen;
 
     /// <summary>
@@ -65,6 +67,31 @@
 
         /// <summary>
         /// Reads the next frame from the audio stream.
+        /// </summary>
+        /// <param name="presentationTimestamp">timestamp when the first sample shall be presented.</param>
+        /// <returns>The decoded audio data.</returns>
+        public AudioData GetNextFrame(out TimeSpan presentationTimestamp)
+        {
+            var frame = base.GetNextFrame() as AudioFrame;
+
+            var converted = AudioFrame.Create(
+                frame.SampleRate,
+                frame.NumChannels,
+                frame.NumSamples,
+                frame.ChannelLayout,
+                SampleFormat.SingleP,
+                frame.DecodingTimestamp,
+                frame.PresentationTimestamp);
+
+            ffmpeg.swr_convert_frame(swrContext, converted.Pointer, frame.Pointer);
+
+            presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);
+
+            return new AudioData(converted);
+        }
+
+        /// <summary>
+        /// Reads the next frame from the audio stream.
         /// A <see langword="false"/> return value indicates that reached end of stream.
         /// The method throws exception if another error has occurred.
         /// </summary>
@@ -104,6 +131,49 @@
 
             ffmpeg.swr_convert_frame(swrContext, converted.Pointer, frame.Pointer);
 
+            return new AudioData(converted);
+        }
+
+        public new AudioData GetFrame(long pts, out TimeSpan presentationTimestamp)
+        {
+            var frame = base.GetFrame(pts) as AudioFrame;
+
+            var converted = AudioFrame.Create(
+                frame.SampleRate,
+                frame.NumChannels,
+                frame.NumSamples,
+                frame.ChannelLayout,
+                SampleFormat.SingleP,
+                frame.DecodingTimestamp,
+                frame.PresentationTimestamp);
+
+            ffmpeg.swr_convert_frame(swrContext, converted.Pointer, frame.Pointer);
+            presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);
+
+            return new AudioData(converted);
+        }
+
+        /// <summary>
+        /// Reads the video frame found at the specified timestamp.
+        /// </summary>
+        /// <param name="time">The frame timestamp.</param>
+        /// <param name="presentationTimestamp">timestamp when the first sample shall be presented.</param>
+        /// <returns>The decoded video frame.</returns>
+        public new AudioData GetFrame(TimeSpan time, out TimeSpan presentationTimestamp)
+        {
+            var frame = base.GetFrame(time) as AudioFrame;
+
+            var converted = AudioFrame.Create(
+                frame.SampleRate,
+                frame.NumChannels,
+                frame.NumSamples,
+                frame.ChannelLayout,
+                SampleFormat.SingleP,
+                frame.DecodingTimestamp,
+                frame.PresentationTimestamp);
+
+            ffmpeg.swr_convert_frame(swrContext, converted.Pointer, frame.Pointer);
+            presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);
             return new AudioData(converted);
         }
 

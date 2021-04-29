@@ -40,6 +40,11 @@
         public long Duration => frame.Duration;
 
         /// <summary>
+        /// Gets the sample rate.
+        /// </summary>
+        public int SampleRate => frame.SampleRate;
+
+        /// <summary>
         /// Fetches raw audio data from this audio frame for specified channel.
         /// </summary>
         /// <param name="channel">The index of audio channel that should be retrieved, allowed range: [0..<see cref="NumChannels"/>).</param>
