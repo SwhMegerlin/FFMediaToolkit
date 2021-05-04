@@ -413,7 +413,7 @@
             }
             else
             {
-                return (long)((frame.PresentationTimestamp * base.Info.TimeBase.num / (double)base.Info.TimeBase.den) * base.Info.AvgFrameRate );
+                return (long)( (frame.PresentationTimestamp * base.Info.AvgFrameRate * base.Info.TimeBase.num ) / (double)(base.Info.TimeBase.den) );
             }
         }
 

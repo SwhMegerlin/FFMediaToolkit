@@ -51,14 +51,7 @@
         {
             var frame = base.GetNextFrame() as AudioFrame;
 
-            var converted = AudioFrame.Create(
-                frame.SampleRate,
-                frame.NumChannels,
-                frame.NumSamples,
-                frame.ChannelLayout,
-                SampleFormat.SingleP,
-                frame.DecodingTimestamp,
-                frame.PresentationTimestamp);
+            var converted = AudioFrame.CreateFromTemplate(frame, SampleFormat.SingleP);
 
             ffmpeg.swr_convert_frame(swrContext, converted.Pointer, frame.Pointer);
 
@@ -74,15 +67,8 @@
         {
             var frame = base.GetNextFrame() as AudioFrame;
 
-            var converted = AudioFrame.Create(
-                frame.SampleRate,
-                frame.NumChannels,
-                frame.NumSamples,
-                frame.ChannelLayout,
-                SampleFormat.SingleP,
-                frame.DecodingTimestamp,
-                frame.PresentationTimestamp);
-
+            var converted = AudioFrame.CreateFromTemplate(frame, SampleFormat.SingleP);
+            
             ffmpeg.swr_convert_frame(swrContext, converted.Pointer, frame.Pointer);
 
             presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);
@@ -120,14 +106,7 @@
         {
             var frame = base.GetFrame(time) as AudioFrame;
 
-            var converted = AudioFrame.Create(
-                frame.SampleRate,
-                frame.NumChannels,
-                frame.NumSamples,
-                frame.ChannelLayout,
-                SampleFormat.SingleP,
-                frame.DecodingTimestamp,
-                frame.PresentationTimestamp);
+            var converted = AudioFrame.CreateFromTemplate(frame, SampleFormat.SingleP);
 
             ffmpeg.swr_convert_frame(swrContext, converted.Pointer, frame.Pointer);
 
@@ -138,14 +117,7 @@
         {
             var frame = base.GetFrame(pts) as AudioFrame;
 
-            var converted = AudioFrame.Create(
-                frame.SampleRate,
-                frame.NumChannels,
-                frame.NumSamples,
-                frame.ChannelLayout,
-                SampleFormat.SingleP,
-                frame.DecodingTimestamp,
-                frame.PresentationTimestamp);
+            var converted = AudioFrame.CreateFromTemplate(frame, SampleFormat.SingleP);
 
             ffmpeg.swr_convert_frame(swrContext, converted.Pointer, frame.Pointer);
             presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);
@@ -163,14 +135,7 @@
         {
             var frame = base.GetFrame(time) as AudioFrame;
 
-            var converted = AudioFrame.Create(
-                frame.SampleRate,
-                frame.NumChannels,
-                frame.NumSamples,
-                frame.ChannelLayout,
-                SampleFormat.SingleP,
-                frame.DecodingTimestamp,
-                frame.PresentationTimestamp);
+            var converted = AudioFrame.CreateFromTemplate(frame, SampleFormat.SingleP);
 
             ffmpeg.swr_convert_frame(swrContext, converted.Pointer, frame.Pointer);
             presentationTimestamp = frame.PresentationTimestamp.ToTimeSpan(base.Info.TimeBase);

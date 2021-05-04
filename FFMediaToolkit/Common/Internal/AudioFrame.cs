@@ -89,6 +89,26 @@
             return new AudioFrame(frame);
         }
 
+        public static AudioFrame CreateFromTemplate(AudioFrame template, SampleFormat sampleFormat)
+        {
+            var frame = ffmpeg.av_frame_alloc();
+
+            frame->sample_rate = template.Pointer->sample_rate;
+            frame->channels = template.Pointer->channels;
+
+            frame->nb_samples = template.Pointer->nb_samples;
+            frame->channel_layout = template.Pointer->channel_layout;
+            frame->format = (int)sampleFormat;
+
+            frame->pts = template.Pointer->pts;
+            frame->pkt_dts = template.Pointer->pkt_dts;
+            frame->pkt_duration = template.Pointer->pkt_duration;
+
+            ffmpeg.av_frame_get_buffer(frame, 32);
+
+            return new AudioFrame(frame);
+        }
+
         /// <summary>
         /// Creates an empty frame for decoding.
         /// </summary>

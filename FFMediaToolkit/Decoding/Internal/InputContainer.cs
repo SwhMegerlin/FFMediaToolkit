@@ -89,6 +89,7 @@
             foreach (var decoder in Decoders)
             {
                 decoder?.FlushUnmanagedBuffers();
+                decoder?.DiscardBufferedData();
             }
             //Decoders[streamIndex].FlushUnmanagedBuffers();
             GetPacketFromStream(streamIndex);
